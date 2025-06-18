@@ -9,6 +9,25 @@ import { Component, OnInit } from '@angular/core';
 })
 
 export class MapCompComponent implements OnInit {
+
+// added a mouse click event listener to each pathway.
+interactiveMap () {
+ const paths = document.querySelectorAll('path');
+//changed mouse cursor to pointer when hovering over a country
+    paths.forEach(path => {
+    (path as SVGPathElement).style.cursor = 'pointer';
+
+// added effect to fill over clicked country
+    path.addEventListener('mouseenter', function () {
+    (path as SVGPathElement).style.fill = 'lightpink';
+    });
+
+// added effect to fill back to black when mouse leaves the country
+      path.addEventListener('mouseleave', function () {
+      (path as SVGPathElement).style.fill = 'black';
+  });
+});
+}
   
   // Variables to store country information
   countryName = 'Example Country';
