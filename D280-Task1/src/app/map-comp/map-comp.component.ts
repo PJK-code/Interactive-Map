@@ -1,45 +1,62 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input, AfterViewInit } from '@angular/core';
+import { NgIf } from '@angular/common';
+import { CountriesService } from '../service/countries.service';
 
 @Component({
   selector: 'app-map-comp',
   standalone: true,
-  imports: [],
+  imports: [NgIf],
   templateUrl: './map-comp.component.html',
-  styleUrl: './map-comp.component.css'
+  styleUrls: ['./map-comp.component.css']
 })
+export class MapCompComponent implements OnInit, AfterViewInit {
+  @Output() submitted = new EventEmitter<string>();
+  @Input() countryIdInputs: any = null; // This will hold the info of the clicked country
 
-export class MapCompComponent implements OnInit {
 
-// added a mouse click event listener to each pathway.
-interactiveMap () {
- const paths = document.querySelectorAll('path');
-//changed mouse cursor to pointer when hovering over a country
-    paths.forEach(path => {
-    (path as SVGPathElement).style.cursor = 'pointer';
+  countryId = ''; // This will hold the ID of the clicked country
 
-// added effect to fill over clicked country
-    path.addEventListener('mouseenter', function () {
-    (path as SVGPathElement).style.fill = 'lightpink';
-    });
-
-// added effect to fill back to black when mouse leaves the country
-      path.addEventListener('mouseleave', function () {
-      (path as SVGPathElement).style.fill = 'black';
-  });
-});
-}
-  
-  // Variables to store country information
-  countryName = 'Example Country';
-  countryCapital = 'Example Capital';
-  countryRegion = 'Example Region';
-  incomeLevel = 'Example Income Level';
-  latitude = 0;
-  longitude = 0;
-
-  constructor() { }
+  constructor(private countries: CountriesService) {}
 
   ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this.interactiveMap();
+  }
+
+  interactiveMap(): void { // This will make the SVG map interactive
+    const paths = document.querySelectorAll('svg path');
+
+    paths.forEach(path => {
+      (path as SVGPathElement).style.cursor = 'pointer';
+
+      path.addEventListener('mouseenter', () => {
+        (path as SVGPathElement).style.fill = 'lightpink';
+      });
+
+      path.addEventListener('mouseleave', () => {
+        (path as SVGPathElement).style.fill = 'black';
+      });
+
+      path.addEventListener('click', (event: Event) => {
+        this.onCountryClick(event);
+      });
+    });
+  }
+
+  onCountryClick(event: Event): void { 
+    event.preventDefault();
+    const path = event.target as SVGPathElement; // this will get the path id
+    this.countryId = path.id;
+
+    this.submitted.emit(this.countryId); 
+    console.log('Clicked country ID:', this.countryId); // this will display the country ID in the console
+
+    this.countries.getCountryData(this.countryId).subscribe((data: any) => { // this will use the service.ts to get the country data
+      this.countryIdInputs = data[1][0];
+      console.log('Selected country data:', this.countryIdInputs); // this will display the country data in the console
+    });
+  }
 }
 
 
