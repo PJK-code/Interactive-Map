@@ -1,0 +1,32 @@
+.item1 {
+  grid-area: header;
+  background-color: lightpink;
+}
+
+.item2 {
+  grid-area: countryHeader;
+  background-color: lightblue;
+  font-size: 25pt;
+}
+
+.item3 {
+  grid-area: main;
+  background-color: lightseagreen;
+}
+
+.item4 {
+  grid-area: side;
+  background-color: lightgreen;
+}
+
+.grid-container {
+  display: grid;
+  grid-template:
+    'header header header header header countryHeader'
+    'main main main main main side'
+    'main main main main main side';
+  grid-gap: 5px;
+  background-color: black;
+  padding: 10px;
+  text-align: center;
+}
