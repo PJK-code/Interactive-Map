@@ -1,0 +1,60 @@
+name: Deploy Angular App to GitHub Pages
+
+on:
+  push:
+    branches: [ refreshed ]
+  pull_request:
+    branches: [ refreshed ]
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+      contents: read    # to read the repository contents
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'D280-Task1/package-lock.json'
+
+    - name: Install dependencies
+      run: |
+        cd D280-Task1
+        npm ci
+
+    - name: Build Angular app
+      run: |
+        cd D280-Task1
+        npm run build -- --base-href /Interactive-Map/
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: 'D280-Task1/dist/d280-task1/browser'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
